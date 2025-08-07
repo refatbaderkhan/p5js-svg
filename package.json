@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "p5": "^2.0.4",
+    "p5.js-svg": "^1.6.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-p5": "^1.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
