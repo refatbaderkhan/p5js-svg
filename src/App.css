@@ -54,19 +54,32 @@ body {
     width: 100vw;
     overflow: hidden;
     display: flex;
-    align-items: center; /* Changed from 'end' to 'center' */
+    align-items: end;
     justify-content: center;
   }
 
   #svg-wrapper {
-    width: 100%; /* Changed from 100vh to 100% */
+    width: 100%;
     height: auto;
-    aspect-ratio: 683 / 930; /* Match SVG aspect ratio */
+    max-width: 100vw;
+    max-height: 100vh;
+    aspect-ratio: 683 / 930;
+    padding-bottom: 20px;
   }
 
   #svg-container {
     position: relative;
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #svg-container > * {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 }

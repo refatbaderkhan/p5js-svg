@@ -1,4 +1,4 @@
-import FinalSVGBlack from "./Final_SVG Black path d";
+import FinalSVGBlack from "./Final_SVG_Black";
 import "./App.css";
 
 const FinalSVG = () => {
