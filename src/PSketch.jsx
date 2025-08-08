@@ -3,11 +3,16 @@ import Sketch from "react-p5";
 
 export default (props) => {
   const [paths, setPaths] = useState([]);
-  const [scaleFactor, setScaleFactor] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [transform, setTransform] = useState({
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+  });
 
+  // Initialize paths and calculate scaling
   useEffect(() => {
     setTimeout(() => {
+      // Get all glow paths from SVG
       const pathElements = document.querySelectorAll(".glow-path");
       const pathData = Array.from(pathElements).map((el) => {
         const d = el.getAttribute("d");
@@ -17,24 +22,28 @@ export default (props) => {
       });
       setPaths(pathData);
 
-      // Calculate scaling and offset for mobile
-      if (window.innerWidth <= 768) {
-        const svgWrapper = document.getElementById("svg-wrapper");
-        const svgContainer = document.getElementById("svg-container");
-        if (svgWrapper && svgContainer) {
-          const scale = svgWrapper.offsetWidth / 683;
-          setScaleFactor(scale);
+      // Calculate scaling and offset
+      const container = document.getElementById("svg-container");
+      const svg = container?.querySelector("svg");
 
-          // Calculate centering offset
-          const containerHeight = svgContainer.offsetHeight;
-          const scaledHeight = 930 * scale;
-          const yOffset = (containerHeight - scaledHeight) / 2;
-          setOffset({ x: 0, y: yOffset });
-        }
+      if (container && svg) {
+        const containerRect = container.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        const scale = Math.min(
+          containerRect.width / 683, // SVG viewBox width
+          containerRect.height / 930 // SVG viewBox height
+        );
+
+        const offsetX = (containerRect.width - 683 * scale) / 2 / scale;
+        const offsetY = (containerRect.height - 930 * scale) / 2 / scale;
+
+        setTransform({ scale, offsetX, offsetY });
       }
     }, 100);
   }, []);
 
+  // Setup p5 canvas
   const setup = (p5, canvasParentRef) => {
     const container = document.getElementById("svg-container");
     if (container) {
@@ -43,21 +52,25 @@ export default (props) => {
     }
   };
 
+  // Main drawing function
   const draw = (p5) => {
     p5.clear();
 
     if (paths.length > 0) {
       const originalPathColor = p5.color("#F0436A");
       const growLightColor = p5.color("#F6E506");
+
+      // Create pulsating effect
       const pulse = p5.sin(p5.frameCount * 0.05);
       const sizeMultiplier = p5.map(pulse, -1, 1, 1, 1.8);
 
       p5.push();
-      if (window.innerWidth <= 768) {
-        p5.translate(offset.x, offset.y);
-        p5.scale(scaleFactor);
-      }
 
+      // Apply scaling and centering transform
+      p5.translate(transform.offsetX, transform.offsetY);
+      p5.scale(transform.scale);
+
+      // Draw each path with glow effect
       paths.forEach(({ path2d, bbox }) => {
         const centerX = bbox.x + bbox.width / 2;
         const centerY = bbox.y + bbox.height / 2;
@@ -82,29 +95,31 @@ export default (props) => {
         p5.drawingContext.fill(path2d);
         p5.pop();
       });
+
       p5.pop();
     }
   };
 
+  // Handle window resize
   const windowResized = (p5) => {
     const container = document.getElementById("svg-container");
     if (container) {
       const { width, height } = container.getBoundingClientRect();
       p5.resizeCanvas(width, height);
 
-      // Recalculate scaling on resize
-      if (window.innerWidth <= 768) {
-        const svgWrapper = document.getElementById("svg-wrapper");
-        const svgContainer = document.getElementById("svg-container");
-        if (svgWrapper && svgContainer) {
-          const scale = svgWrapper.offsetWidth / 683;
-          setScaleFactor(scale);
+      // Recalculate transform on resize
+      const svg = container.querySelector("svg");
+      if (svg) {
+        const containerRect = container.getBoundingClientRect();
+        const scale = Math.min(
+          containerRect.width / 683,
+          containerRect.height / 930
+        );
 
-          const containerHeight = svgContainer.offsetHeight;
-          const scaledHeight = 930 * scale;
-          const yOffset = (containerHeight - scaledHeight) / 2;
-          setOffset({ x: 0, y: yOffset });
-        }
+        const offsetX = (containerRect.width - 683 * scale) / 2 / scale;
+        const offsetY = (containerRect.height - 930 * scale) / 2 / scale;
+
+        setTransform({ scale, offsetX, offsetY });
       }
     }
   };

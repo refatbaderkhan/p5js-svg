@@ -54,7 +54,7 @@ body {
     width: 100vw;
     overflow: hidden;
     display: flex;
-    align-items: end;
+    align-items: center; /* Changed from 'end' to 'center' */
     justify-content: center;
   }
 
@@ -62,9 +62,8 @@ body {
     width: 100%;
     height: auto;
     max-width: 100vw;
-    max-height: 100vh;
+    max-height: calc(100vh - 20px); /* Add small margin */
     aspect-ratio: 683 / 930;
-    padding-bottom: 20px;
   }
 
   #svg-container {
@@ -81,5 +80,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transform-origin: center center; /* Ensure scaling happens from center */
   }
 }
